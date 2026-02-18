@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SOG Viewer Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              accent: '#4F46E5'
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      .glass { backdrop-filter: blur(10px); background: rgba(15,23,42,.55); }
+    </style>
+  </head>
+  <body class="h-full bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div class="flex h-full overflow-hidden" id="app-shell">
+      <aside class="hidden w-80 shrink-0 border-r border-slate-200 bg-white/90 p-4 dark:border-slate-800 dark:bg-slate-900/90 lg:flex lg:flex-col" id="sidebar">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Landmarks</h2>
+          <button class="rounded bg-accent px-2 py-1 text-xs text-white">导入 .sog</button>
+        </div>
+        <div class="space-y-2 overflow-auto">
+          <article class="rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+            <p class="text-sm font-medium">主楼 Main Tower</p>
+            <p class="text-xs text-slate-500">(34.123, 120.219, 8.82)</p>
+            <div class="mt-2 flex gap-2">
+              <button class="rounded bg-slate-800 px-2 py-1 text-xs text-white dark:bg-slate-100 dark:text-slate-900">聚焦</button>
+              <button class="rounded border border-slate-300 px-2 py-1 text-xs dark:border-slate-600">俯视</button>
+            </div>
+          </article>
+        </div>
+      </aside>
+
+      <main class="relative flex-1">
+        <header class="absolute left-4 right-4 top-4 z-20 flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
+          <button class="rounded-lg px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800">加载</button>
+          <button class="rounded-lg px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800">视角复位</button>
+          <button class="rounded-lg px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800">播放/暂停轨迹</button>
+          <button class="rounded-lg px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800">主题切换</button>
+          <div class="ml-auto flex items-center gap-2 text-xs text-slate-500">
+            <span>FPS 58</span><span>|</span><span>Splats 321k</span><span>|</span><span>Mem 402MB</span>
+          </div>
+        </header>
+
+        <section class="h-full w-full bg-gradient-to-b from-slate-900 to-slate-700" id="webgl-canvas-slot">
+          <div class="absolute bottom-4 right-4 z-20 rounded-lg px-3 py-2 text-xs text-white glass">按住 Shift 进入建筑锁定模式</div>
+        </section>
+
+        <nav class="absolute bottom-0 left-0 right-0 z-30 grid grid-cols-4 gap-px border-t border-slate-700 bg-slate-800 text-xs text-slate-200 lg:hidden">
+          <button class="py-3">地标</button><button class="py-3">加载</button><button class="py-3">聚焦</button><button class="py-3">设置</button>
+        </nav>
+      </main>
+    </div>
+
+    <script type="application/json" id="ui-dsl">
+{
+  "layout": {
+    "shell": "sidebar + viewport + topbar + mobile-nav",
+    "responsive": {
+      "desktop": "sidebar fixed-left",
+      "mobile": "drawer-or-bottom-nav"
+    }
+  },
+  "components": [
+    {"name": "TopToolbar", "actions": ["load", "resetView", "togglePath", "toggleTheme"]},
+    {"name": "LandmarkSidebar", "itemFields": ["name", "coords"], "itemActions": ["focus", "topView"]},
+    {"name": "PerfOverlay", "metrics": ["fps", "visibleSplats", "gpuMem"]},
+    {"name": "FallbackToast", "states": ["webgl_unsupported", "load_failed", "degraded_mode"]}
+  ],
+  "interaction": {
+    "focusTransitionMs": 800,
+    "cameraModes": ["free", "buildingLocked"],
+    "mobileGestures": ["singleRotate", "doublePinch", "triplePan"]
+  }
+}
+    </script>
+  </body>
+</html>
